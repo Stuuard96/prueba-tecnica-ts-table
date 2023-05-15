@@ -26,7 +26,7 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  justify-content: center;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -74,4 +74,13 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+table thead tr > th {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #646cff;
+}
+
+table thead tr > th:not(:first-child):not(:last-child):hover {
+  background-color: #646cff;
 }

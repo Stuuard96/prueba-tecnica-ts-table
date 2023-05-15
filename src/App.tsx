@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     try {
       const getRandomUser = async () => {
-        const response = await fetch('https://randomuser.me/api/?results=100')
+        const response = await fetch('https://randomuser.me/api/?results=10')
         const data = await response.json()
         setUsers(data.results)
         originalUsers.current = data.results
