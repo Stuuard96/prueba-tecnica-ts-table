@@ -10,6 +10,14 @@ function App() {
   const [search, setSearch] = useState<string | null>(null)
   const originalUsers = useRef<User[]>([])
 
+  const sortingComparisons = {
+    [SortBy.COUNTRY]: (a: User, b: User) =>
+      a.location.country.localeCompare(b.location.country),
+    [SortBy.NAME]: (a: User, b: User) =>
+      a.name.first.localeCompare(b.name.first),
+    [SortBy.LAST]: (a: User, b: User) => a.name.last.localeCompare(b.name.last)
+  }
+
   useEffect(() => {
     try {
       const getRandomUser = async () => {
@@ -52,22 +60,8 @@ function App() {
   }, [search, users])
 
   const sortedUsers = useMemo(() => {
-    if (sorting === SortBy.COUNTRY) {
-      return filteredUsers.toSorted((a, b) =>
-        a.location.country.localeCompare(b.location.country)
-      )
-    }
-    if (sorting === SortBy.NAME) {
-      return filteredUsers.toSorted((a, b) =>
-        a.name.first.localeCompare(b.name.first)
-      )
-    }
-    if (sorting === SortBy.LAST) {
-      return filteredUsers.toSorted((a, b) =>
-        a.name.last.localeCompare(b.name.last)
-      )
-    }
-    return filteredUsers
+    if (sorting === SortBy.NONE) return filteredUsers
+    return filteredUsers.toSorted(sortingComparisons[sorting])
   }, [filteredUsers, sorting])
 
   return (
