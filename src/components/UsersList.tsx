@@ -18,13 +18,28 @@ export function UsersList({
       <thead>
         <tr>
           <th>Foto</th>
-          <th className="pointer" onClick={() => changeSorting(SortBy.NAME)}>
+          <th
+            className="pointer"
+            onClick={() => {
+              changeSorting(SortBy.NAME)
+            }}
+          >
             Nombre
           </th>
-          <th className="pointer" onClick={() => changeSorting(SortBy.LAST)}>
+          <th
+            className="pointer"
+            onClick={() => {
+              changeSorting(SortBy.LAST)
+            }}
+          >
             Apellido
           </th>
-          <th className="pointer" onClick={() => changeSorting(SortBy.COUNTRY)}>
+          <th
+            className="pointer"
+            onClick={() => {
+              changeSorting(SortBy.COUNTRY)
+            }}
+          >
             País
           </th>
           <th>Accciones</th>

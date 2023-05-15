@@ -37,13 +37,11 @@ function App() {
     setShowColors(!showColors)
   }
 
-  const toggleSortByCountry = () => {
-    const newSorting = sorting === SortBy.NONE ? SortBy.COUNTRY : SortBy.NONE
-    setSorting(newSorting)
-  }
-
   const changeSorting = (newSorting: SortBy) => {
-    setSorting(newSorting)
+    if (newSorting !== sorting) {
+      return setSorting(newSorting)
+    }
+    setSorting(SortBy.NONE)
   }
 
   const filteredUsers = useMemo(() => {
@@ -77,7 +75,7 @@ function App() {
       <h1>Prueba Técnica</h1>
       <header>
         <button onClick={toggleColors}>Colorear filas</button>
-        <button onClick={toggleSortByCountry}>
+        <button onClick={() => changeSorting(SortBy.COUNTRY)}>
           {sorting === SortBy.COUNTRY
             ? 'No ordenar por país'
             : 'Ordenar por País'}
