@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { UsersList } from './components/UsersList'
 import { SortBy, User } from './types.d'
+import { Spinner } from './components/Spinner'
 
 function App() {
   const [users, setUsers] = useState<User[]>([])
@@ -11,19 +12,25 @@ function App() {
   const [search, setSearch] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     const getRandomUser = async () => {
       try {
         setLoading(true)
         setError(null)
-        const response = await fetch('https://randomuser.me/api/?results=10')
+        const response = await fetch(
+          `https://randomuser.me/api/?results=10&seed=stuar&page=${currentPage}`
+        )
         if (!response.ok) {
           throw new Error('Error fetching users')
         }
         const data = await response.json()
-        setUsers(data.results)
-        originalUsers.current = data.results
+        setUsers((prevUsers) => {
+          const newUsers = prevUsers.concat(data.results)
+          originalUsers.current = newUsers
+          return newUsers
+        })
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message)
@@ -34,6 +41,17 @@ function App() {
       }
     }
     getRandomUser()
+  }, [currentPage])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        setCurrentPage((prevPage) => prevPage + 1)
+      }
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const handleDelete = (uuid: string) => {
@@ -95,17 +113,19 @@ function App() {
         />
       </header>
       <main>
-        {loading && <p>Cargando...</p>}
-        {!loading && error && <p>{error}</p>}
-        {!loading && !error && !users.length && <p>No hay usuarios</p>}
-        {!loading && !error && users.length > 0 && (
-          <UsersList
-            users={sortedUsers}
-            deleteUser={handleDelete}
-            showColors={showColors}
-            changeSorting={changeSorting}
-          />
+        {users.length > 0 && (
+          <>
+            <UsersList
+              users={sortedUsers}
+              deleteUser={handleDelete}
+              showColors={showColors}
+              changeSorting={changeSorting}
+            />
+          </>
         )}
+        {loading && <Spinner />}
+        {error && <p>{error}</p>}
+        {!loading && !error && !users.length && <p>No hay usuarios</p>}
       </main>
     </>
   )

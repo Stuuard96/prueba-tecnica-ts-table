@@ -14,7 +14,7 @@ export function UsersList({
   changeSorting
 }: Props) {
   return (
-    <table style={{ width: '100%' }}>
+    <table>
       <thead>
         <tr>
           <th>Foto</th>
