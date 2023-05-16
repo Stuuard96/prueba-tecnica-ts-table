@@ -14,21 +14,23 @@ function App() {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
-    refetch
+    isFetchingNextPage
   } = useUsers()
 
+  const [deletedUserIds, setDeletedUserIds] = useState<string[]>([])
   const [showColors, setShowColors] = useState(false)
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE)
   const [search, setSearch] = useState<string | null>(null)
 
   const handleDelete = (uuid: string) => {
-    // Metodo para eliminar usuarios de la lista
-    console.log(uuid)
+    // Simulación de eliminación marcando el usuario como eliminado
+    setDeletedUserIds((prevDeletedUserIds) => [...prevDeletedUserIds, uuid])
   }
 
   const handleReset = () => {
-    refetch()
+    setDeletedUserIds([])
+    setSearch(null)
+    setSorting(SortBy.NONE)
   }
 
   const toggleColors = () => {
@@ -49,6 +51,12 @@ function App() {
     )
   }, [search, users])
 
+  const activeUsers = useMemo(() => {
+    return filteredUsers.filter(
+      (user) => !deletedUserIds.includes(user.login.uuid)
+    )
+  }, [filteredUsers, deletedUserIds])
+
   const sortedUsers = useMemo(() => {
     const sortingComparisons = {
       [SortBy.COUNTRY]: (a: User, b: User) =>
@@ -59,14 +67,14 @@ function App() {
         a.name.last.localeCompare(b.name.last)
     }
 
-    if (sorting === SortBy.NONE) return filteredUsers
-    return filteredUsers.toSorted(sortingComparisons[sorting])
-  }, [filteredUsers, sorting])
+    if (sorting === SortBy.NONE) return activeUsers
+    return activeUsers.toSorted(sortingComparisons[sorting])
+  }, [activeUsers, sorting])
 
   return (
     <>
       <h1 style={{ margin: '0' }}>Prueba Técnica</h1>
-      <Results />
+      <Results users={sortedUsers} />
       <header>
         <button onClick={toggleColors}>Colorear filas</button>
         <button onClick={() => changeSorting(SortBy.COUNTRY)}>

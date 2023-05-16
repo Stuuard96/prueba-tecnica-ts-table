@@ -1,6 +1,10 @@
-import { useUsers } from '../hooks/useUsers'
+import { User } from '../types.d'
 
-export function Results() {
-  const { users } = useUsers()
-  return <h2>Resultados: {users.length}</h2>
+interface Props {
+  users: User[]
+}
+
+export function Results({ users }: Props) {
+  const results = users.length
+  return <h2>Resultados: {results}</h2>
 }
