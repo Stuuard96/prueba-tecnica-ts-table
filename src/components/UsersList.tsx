@@ -3,14 +3,14 @@ import { SortBy, User } from '../types.d'
 interface Props {
   users: User[]
   showColors: boolean
-  deleteUser: (uuid: string) => void
+  // deleteUser: (uuid: string) => void
   changeSorting: (newSorting: SortBy) => void
 }
 
 export function UsersList({
   users,
   showColors,
-  deleteUser,
+  // deleteUser,
   changeSorting
 }: Props) {
   return (
@@ -55,11 +55,11 @@ export function UsersList({
               <td>{user.name.first}</td>
               <td>{user.name.last}</td>
               <td>{user.location.country}</td>
-              <td>
+              {/* <td>
                 <button onClick={() => deleteUser(user.login.uuid)}>
                   Borrar
                 </button>
-              </td>
+              </td> */}
             </tr>
           )
         })}

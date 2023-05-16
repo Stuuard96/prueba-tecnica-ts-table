@@ -1,66 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import './App.css'
+import { useMemo, useState } from 'react'
 import { UsersList } from './components/UsersList'
 import { SortBy, User } from './types.d'
 import { Spinner } from './components/Spinner'
+import { useUsers } from './hooks/useUsers'
+import './App.css'
 
 function App() {
-  const [users, setUsers] = useState<User[]>([])
-  const originalUsers = useRef<User[]>([])
+  const {
+    users,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch
+  } = useUsers()
+
   const [showColors, setShowColors] = useState(false)
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE)
   const [search, setSearch] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
 
-  useEffect(() => {
-    const getRandomUser = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const response = await fetch(
-          `https://randomuser.me/api/?results=10&seed=stuar&page=${currentPage}`
-        )
-        if (!response.ok) {
-          throw new Error('Error fetching users')
-        }
-        const data = await response.json()
-        setUsers((prevUsers) => {
-          const newUsers = prevUsers.concat(data.results)
-          originalUsers.current = newUsers
-          return newUsers
-        })
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message)
-        }
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    getRandomUser()
-  }, [currentPage])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } = document.documentElement
-      if (scrollTop + clientHeight >= scrollHeight - 5) {
-        setCurrentPage((prevPage) => prevPage + 1)
-      }
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const handleDelete = (uuid: string) => {
-    const filteredUsers = users.filter((user) => user.login.uuid !== uuid)
-    setUsers(filteredUsers)
-  }
+  // const handleDelete = (uuid: string) => {
+  //   const filteredUsers = users.filter((user) => user.login.uuid !== uuid)
+  //   setUsers(filteredUsers)
+  // }
 
   const handleReset = () => {
-    setUsers(originalUsers.current)
+    refetch()
   }
 
   const toggleColors = () => {
@@ -117,15 +83,21 @@ function App() {
           <>
             <UsersList
               users={sortedUsers}
-              deleteUser={handleDelete}
+              // deleteUser={handleDelete}
               showColors={showColors}
               changeSorting={changeSorting}
             />
+            {isFetchingNextPage && <Spinner />}
+            {!isFetchingNextPage && hasNextPage && (
+              <button onClick={() => fetchNextPage()}>
+                Cargar más usuarios
+              </button>
+            )}
           </>
         )}
-        {loading && <Spinner />}
-        {error && <p>{error}</p>}
-        {!loading && !error && !users.length && <p>No hay usuarios</p>}
+        {isLoading && <Spinner />}
+        {/* {isError && <p>{`An error has occurred: ${error.message}`}</p>} */}
+        {!isLoading && !error && !users.length && <p>No hay usuarios</p>}
       </main>
     </>
   )
