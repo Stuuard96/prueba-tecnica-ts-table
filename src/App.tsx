@@ -4,11 +4,13 @@ import { SortBy, User } from './types.d'
 import { Spinner } from './components/Spinner'
 import { useUsers } from './hooks/useUsers'
 import './App.css'
+import { Results } from './components/Results'
 
 function App() {
   const {
     users,
     isLoading,
+    isError,
     error,
     fetchNextPage,
     hasNextPage,
@@ -20,10 +22,10 @@ function App() {
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE)
   const [search, setSearch] = useState<string | null>(null)
 
-  // const handleDelete = (uuid: string) => {
-  //   const filteredUsers = users.filter((user) => user.login.uuid !== uuid)
-  //   setUsers(filteredUsers)
-  // }
+  const handleDelete = (uuid: string) => {
+    // Metodo para eliminar usuarios de la lista
+    console.log(uuid)
+  }
 
   const handleReset = () => {
     refetch()
@@ -63,7 +65,8 @@ function App() {
 
   return (
     <>
-      <h1>Prueba Técnica</h1>
+      <h1 style={{ margin: '0' }}>Prueba Técnica</h1>
+      <Results />
       <header>
         <button onClick={toggleColors}>Colorear filas</button>
         <button onClick={() => changeSorting(SortBy.COUNTRY)}>
@@ -83,20 +86,26 @@ function App() {
           <>
             <UsersList
               users={sortedUsers}
-              // deleteUser={handleDelete}
+              deleteUser={handleDelete}
               showColors={showColors}
               changeSorting={changeSorting}
             />
-            {isFetchingNextPage && <Spinner />}
-            {!isFetchingNextPage && hasNextPage && (
-              <button onClick={() => fetchNextPage()}>
+            {isFetchingNextPage ? (
+              <Spinner />
+            ) : hasNextPage ? (
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}
+              >
                 Cargar más usuarios
               </button>
+            ) : (
+              <p style={{ fontWeight: 'bold' }}>No hay más usuarios</p>
             )}
           </>
         )}
         {isLoading && <Spinner />}
-        {/* {isError && <p>{`An error has occurred: ${error.message}`}</p>} */}
+        {isError && <p>{`Ha ocurrido un error: ${String(error)}`}</p>}
         {!isLoading && !error && !users.length && <p>No hay usuarios</p>}
       </main>
     </>
